@@ -1,0 +1,9 @@
+id;name;brand;price;quantity;connectionType;dpi
+201;MX Master 3S;Logitech;99.99;20;WIRELESS;8000
+202;DeathAdder V3;Razer;69.99;12;WIRED;30000
+203;G502 Hero;Logitech;49.99;18;WIRED;25600
+204;Model O;Glorious;59.99;9;WIRED;19000
+205;Magic Mouse;Apple;79.00;5;WIRELESS;1300
+206;M185;Logitech;14.99;40;WIRELESS;1000
+207;Basilisk V3;Razer;59.99;7;WIRED;26000
+208;Viper Ultimate;Razer;129.99;0;WIRELESS;20000

@@ -1,0 +1,9 @@
+id;name;brand;price;quantity;layout;connectionType
+301;K2;Keychron;89.99;15;ANSI;WIRELESS
+302;MX Keys;Logitech;109.99;10;ISO;WIRELESS
+303;K552 Kumara;Redragon;39.99;22;ANSI;WIRED
+304;Huntsman Mini;Razer;119.99;6;ANSI;WIRED
+305;G915;Logitech;199.99;3;ANSI;WIRELESS
+306;K380;Logitech;39.99;25;ISO;WIRELESS
+307;Apex Pro;SteelSeries;179.99;0;ISO;WIRED
+308;Q1;Keychron;169.00;5;ANSI;WIRED

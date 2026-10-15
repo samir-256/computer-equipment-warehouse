@@ -1,0 +1,11 @@
+id;name;brand;price;quantity;cpu;ramGb;screenSize
+1;XPS 13;Dell;1199.99;5;Intel Core i7;16;13.4
+2;ThinkPad E14;Lenovo;849.50;8;AMD Ryzen 5;16;14.0
+3;MacBook Air;Apple;1099.00;4;Apple M2;8;13.6
+4;Vivobook 15;ASUS;629.90;12;Intel Core i5;8;15.6
+5;Pavilion 15;HP;699.00;7;Intel Core i5;16;15.6
+6;Swift 3;Acer;579.99;9;AMD Ryzen 5;8;14.0
+7;Legion 5;Lenovo;1299.00;3;AMD Ryzen 7;32;15.6
+8;ROG Zephyrus G14;ASUS;1599.00;2;AMD Ryzen 9;32;14.0
+9;Inspiron 16;Dell;749.00;6;Intel Core i7;16;16.0
+10;ZenBook 14;ASUS;999.00;0;Intel Core i7;16;14.0
