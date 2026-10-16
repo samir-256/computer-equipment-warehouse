@@ -1,0 +1,6 @@
+id;name;brand;price;quantity;cpu;ramGb;screenSize
+1;Alpha 14;Acme;1000.00;2;Intel Core i5;8;14.0
+2;Alpha 15;Acme;1200.00;0;Intel Core i7;16;15.6
+3;Beta 13;Globex;800.50;5;AMD Ryzen 5;8;13.3
+4;Beta 16;Globex;1500.00;1;AMD Ryzen 7;32;16.0
+5;Gamma 15;Initech;950.00;3;Intel Core i5;16;15.6

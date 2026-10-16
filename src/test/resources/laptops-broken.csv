@@ -1,0 +1,3 @@
+id;name;brand;price;quantity;cpu;ramGb;screenSize
+1;Alpha 14;Acme;1000.00;2;Intel Core i5;8;14.0
+2;Beta 13;Globex;abc;5;AMD Ryzen 5;8;13.3
