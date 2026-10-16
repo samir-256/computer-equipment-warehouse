@@ -1,4 +1,4 @@
-package com.warehouse.dao.criteria;
+package com.warehouse.common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

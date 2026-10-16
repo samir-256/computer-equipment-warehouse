@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.warehouse.common.Range;
 import com.warehouse.dao.criteria.AllMatchCriteria;
 import com.warehouse.dao.criteria.BrandParameter;
 import com.warehouse.dao.criteria.ConnectionTypeParameter;
@@ -12,7 +13,6 @@ import com.warehouse.dao.criteria.NameParameter;
 import com.warehouse.dao.criteria.Parameter;
 import com.warehouse.dao.criteria.PriceRangeParameter;
 import com.warehouse.dao.criteria.QuantityRangeParameter;
-import com.warehouse.dao.criteria.Range;
 import com.warehouse.dao.criteria.ScreenSizeParameter;
 import com.warehouse.dao.criteria.SearchCriteria;
 import com.warehouse.dao.source.LaptopCsvSource;

@@ -1,4 +1,4 @@
-package com.warehouse.dao.criteria;
+package com.warehouse.common;
 
 import java.util.Objects;
 

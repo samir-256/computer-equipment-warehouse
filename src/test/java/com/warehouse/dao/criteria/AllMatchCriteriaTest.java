@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.warehouse.Samples;
+import com.warehouse.common.Range;
 import com.warehouse.entity.Laptop;
 import org.junit.jupiter.api.Test;
 

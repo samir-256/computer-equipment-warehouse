@@ -1,5 +1,6 @@
 package com.warehouse.dao.criteria;
 
+import com.warehouse.common.Range;
 import com.warehouse.entity.Equipment;
 import java.util.Objects;
 
