@@ -27,6 +27,13 @@ class ControllerImplTest {
         return controller.handle(RequestFactory.create(text));
     }
 
+    private static List<String> texts(Response response) {
+        return response.table().orElseThrow().rows().stream()
+                .flatMap(List::stream)
+                .map(Table.Cell::text)
+                .toList();
+    }
+
     private static Controller controller(StubService service) {
         return new ControllerImpl(new CommandProvider(service));
     }
@@ -39,8 +46,8 @@ class ControllerImplTest {
 
         assertTrue(response.isOk());
         assertFalse(response.isOut());
-        assertTrue(response.responseString().contains("Laptop 1"));
-        assertTrue(response.responseString().contains("Found 2 product(s)."));
+        assertTrue(texts(response).contains("Laptop 1"));
+        assertEquals("Found 2 product(s).", response.responseString());
         assertEquals("Acme", service.lastQuery().brand());
         assertEquals(Category.ALL, service.lastQuery().category());
     }
@@ -52,6 +59,7 @@ class ControllerImplTest {
         assertTrue(response.isOk());
         assertFalse(response.isOut());
         assertEquals("No products found.", response.responseString());
+        assertTrue(response.table().isEmpty());
     }
 
     @Test

@@ -15,8 +15,10 @@ import com.warehouse.entity.Mouse;
 import com.warehouse.service.EquipmentService;
 import com.warehouse.service.ServiceFactory;
 import com.warehouse.view.AppInfo;
+import com.warehouse.view.BorderStyle;
 import com.warehouse.view.ConsoleView;
 import com.warehouse.view.ViewFactory;
+import com.warehouse.view.ViewSettings;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -50,6 +54,7 @@ public final class PropertiesConfig implements Config {
     public void init() {
         Properties properties = load();
         AppInfo info = appInfo(properties);
+        ViewSettings settings = viewSettings(properties);
         BufferedReader input = input();
         Map<Class<? extends Equipment>, EquipmentDao<? extends Equipment>> daos = daos(properties);
         EquipmentService service = Instances.create(
@@ -62,7 +67,7 @@ public final class PropertiesConfig implements Config {
                 System.out,
                 ControllerFactory.getController(),
                 info,
-                batchFile != null));
+                settings));
     }
 
     private BufferedReader input() {
@@ -97,6 +102,29 @@ public final class PropertiesConfig implements Config {
                 date(required(properties, "app.created")),
                 required(properties, "developer.name"),
                 required(properties, "developer.email"));
+    }
+
+    private ViewSettings viewSettings(Properties properties) {
+        return new ViewSettings(color(properties), borders(properties), batchFile != null);
+    }
+
+    private boolean color(Properties properties) {
+        String value = required(properties, "view.color").toLowerCase(Locale.ROOT);
+        if (!value.equals("true") && !value.equals("false")) {
+            throw new IllegalStateException("Property 'view.color' must be true or false in "
+                    + resourceName + ", but was '" + value + "'");
+        }
+        return Boolean.parseBoolean(value);
+    }
+
+    private BorderStyle borders(Properties properties) {
+        String value = required(properties, "view.borders");
+        return Arrays.stream(BorderStyle.values())
+                .filter(style -> style.name().equalsIgnoreCase(value))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Property 'view.borders' must be one of "
+                        + Arrays.toString(BorderStyle.values()) + " in " + resourceName + ", but was '"
+                        + value + "'"));
     }
 
     private Map<Class<? extends Equipment>, EquipmentDao<? extends Equipment>> daos(Properties properties) {

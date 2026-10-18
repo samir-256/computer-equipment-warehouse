@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.warehouse.controller.Controller;
 import com.warehouse.controller.Request;
 import com.warehouse.controller.Response;
+import com.warehouse.controller.Table;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -15,6 +16,7 @@ import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class ConsoleViewTest {
@@ -35,9 +37,38 @@ class ConsoleViewTest {
                 case "exit" -> response("Goodbye!", true, true);
                 case "bad" -> response("bad command", false, false);
                 case "fatal" -> response("Fatal error: broken", false, true);
+                case "table" -> tableResponse();
                 default -> response("result of " + text, true, false);
             };
         }
+    }
+
+    private static Response tableResponse() {
+        Table table = new Table("Things",
+                List.of(new Table.Column("ID", Table.Alignment.RIGHT), new Table.Column("Name", Table.Alignment.LEFT)),
+                List.of(List.of(Table.Cell.of("1"), Table.Cell.of("Alpha"))),
+                List.of());
+        return new Response() {
+            @Override
+            public String responseString() {
+                return "Found 1 product(s).";
+            }
+
+            @Override
+            public boolean isOk() {
+                return true;
+            }
+
+            @Override
+            public boolean isOut() {
+                return false;
+            }
+
+            @Override
+            public Optional<Table> table() {
+                return Optional.of(table);
+            }
+        };
     }
 
     private static Response response(String text, boolean ok, boolean out) {
@@ -146,7 +177,7 @@ class ConsoleViewTest {
         FakeController controller = new FakeController();
         StubInput io = new StubInput("find laptops\nexit\n");
 
-        new ConsoleView(io.in(), io.out(), controller, INFO, true).start();
+        new ConsoleView(io.in(), io.out(), controller, INFO, new ViewSettings(false, BorderStyle.ASCII, true)).start();
 
         assertTrue(io.output().contains("> find laptops"));
         assertTrue(io.output().contains("> exit"));
@@ -157,6 +188,53 @@ class ConsoleViewTest {
         String output = run("find laptops\nexit\n", new FakeController());
 
         assertFalse(output.contains("> find laptops"));
+    }
+
+    @Test
+    void tableIsDrawnBeforeTheMessage() {
+        String output = run("table\nexit\n", new FakeController());
+
+        assertTrue(output.contains("| ID | Name  |"));
+        assertTrue(output.contains("|  1 | Alpha |"));
+        assertTrue(output.indexOf("Alpha") < output.indexOf("Found 1 product(s)."));
+    }
+
+    @Test
+    void startupInfoIsFramed() {
+        String output = run("exit\n", new FakeController());
+
+        assertTrue(output.contains("| Test Warehouse"));
+        assertTrue(output.contains("+---"));
+    }
+
+    @Test
+    void colorSettingPaintsPromptErrorsAndFoundLine() {
+        StubInput io = new StubInput("bad\ntable\nexit\n");
+
+        new ConsoleView(io.in(), io.out(), new FakeController(), INFO,
+                new ViewSettings(true, BorderStyle.UNICODE, false)).start();
+
+        String output = io.output();
+        assertTrue(output.contains("\u001B[32m> \u001B[0m"));
+        assertTrue(output.contains("\u001B[31mError: bad command\u001B[0m"));
+        assertTrue(output.contains("\u001B[32mFound 1 product(s).\u001B[0m"));
+        assertTrue(output.contains("\u250C"));
+    }
+
+    @Test
+    void plainSettingsNeverPrintColorCodes() {
+        String output = run("bad\ntable\nexit\n", new FakeController());
+
+        assertFalse(output.contains("\u001B"));
+    }
+
+    @Test
+    void settingsMustNotBeNull() {
+        StubInput io = new StubInput("");
+
+        assertThrows(NullPointerException.class,
+                () -> new ConsoleView(io.in(), io.out(), new FakeController(), INFO, null));
+        assertThrows(NullPointerException.class, () -> new ViewSettings(true, null, false));
     }
 
     @Test

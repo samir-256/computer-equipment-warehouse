@@ -1,5 +1,7 @@
 package com.warehouse.controller;
 
+import java.util.Optional;
+
 public interface Response {
 
     String responseString();
@@ -7,4 +9,8 @@ public interface Response {
     boolean isOk();
 
     boolean isOut();
+
+    default Optional<Table> table() {
+        return Optional.empty();
+    }
 }

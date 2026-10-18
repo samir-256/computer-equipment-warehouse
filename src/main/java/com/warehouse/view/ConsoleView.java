@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Objects;
 
 public final class ConsoleView implements View {
@@ -19,18 +20,23 @@ public final class ConsoleView implements View {
     private final Controller controller;
     private final AppInfo info;
     private final boolean echoInput;
+    private final Style style;
+    private final ConsoleRenderer renderer;
 
     public ConsoleView(BufferedReader in, PrintStream out, Controller controller, AppInfo info) {
-        this(in, out, controller, info, false);
+        this(in, out, controller, info, ViewSettings.plain());
     }
 
     public ConsoleView(BufferedReader in, PrintStream out, Controller controller, AppInfo info,
-                       boolean echoInput) {
+                       ViewSettings settings) {
         this.in = Objects.requireNonNull(in, "Input must not be null");
         this.out = Objects.requireNonNull(out, "Output must not be null");
         this.controller = Objects.requireNonNull(controller, "Controller must not be null");
         this.info = Objects.requireNonNull(info, "Application info must not be null");
-        this.echoInput = echoInput;
+        Objects.requireNonNull(settings, "View settings must not be null");
+        this.echoInput = settings.echoInput();
+        this.style = new Style(settings.color());
+        this.renderer = new ConsoleRenderer(settings.borders(), style);
     }
 
     @Override
@@ -54,17 +60,18 @@ public final class ConsoleView implements View {
     }
 
     private void printStartupScreen() {
-        out.println(info.name());
-        out.println("Version: " + info.version());
-        out.println("Created: " + info.created());
-        out.println("Developer: " + info.developerName() + " <" + info.developerEmail() + ">");
+        out.println(renderer.renderBox(List.of(
+                info.name(),
+                "Version: " + info.version(),
+                "Created: " + info.created(),
+                "Developer: " + info.developerName() + " <" + info.developerEmail() + ">")));
         out.println();
         show(controller.handle(RequestFactory.create(HELP_COMMAND)));
         out.println();
     }
 
     private String readLine() {
-        out.print(PROMPT);
+        out.print(style.prompt(PROMPT));
         out.flush();
         try {
             String line = in.readLine();
@@ -78,8 +85,16 @@ public final class ConsoleView implements View {
     }
 
     private boolean show(Response response) {
-        boolean ordinaryError = !response.isOk() && !response.isOut();
-        out.println(ordinaryError ? "Error: " + response.responseString() : response.responseString());
+        response.table().ifPresent(table -> out.println(renderer.renderTable(table)));
+        out.println(message(response));
         return !response.isOut();
+    }
+
+    private String message(Response response) {
+        String text = response.responseString();
+        if (!response.isOk()) {
+            return style.danger(response.isOut() ? text : "Error: " + text);
+        }
+        return response.table().isPresent() ? style.success(text) : text;
     }
 }

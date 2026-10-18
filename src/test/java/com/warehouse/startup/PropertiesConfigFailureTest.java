@@ -85,6 +85,28 @@ class PropertiesConfigFailureTest {
     }
 
     @Test
+    void badColorValueIsReported() {
+        String message = failureOf("app-bad-color.properties");
+
+        assertTrue(message.contains("view.color"));
+        assertTrue(message.contains("maybe"));
+    }
+
+    @Test
+    void badBorderStyleIsReported() {
+        String message = failureOf("app-bad-borders.properties");
+
+        assertTrue(message.contains("view.borders"));
+        assertTrue(message.contains("fancy"));
+        assertTrue(message.contains("UNICODE"));
+    }
+
+    @Test
+    void missingBorderStyleIsReported() {
+        assertTrue(failureOf("app-no-borders.properties").contains("view.borders"));
+    }
+
+    @Test
     void failedConfigurationLeavesFactoriesUntouched() {
         failureOf("app-no-name.properties");
 
