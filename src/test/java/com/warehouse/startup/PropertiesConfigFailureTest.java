@@ -47,6 +47,44 @@ class PropertiesConfigFailureTest {
     }
 
     @Test
+    void unknownSourceClassIsReported() {
+        assertTrue(failureOf("app-unknown-source.properties").contains("com.warehouse.NoSuchSource"));
+    }
+
+    @Test
+    void sourceClassOfWrongTypeIsReported() {
+        String message = failureOf("app-wrong-source-type.properties");
+
+        assertTrue(message.contains("java.lang.String"));
+        assertTrue(message.contains("Source"));
+    }
+
+    @Test
+    void sourceWithoutSuitableConstructorIsReported() {
+        assertTrue(failureOf("app-no-constructor.properties").contains("no public constructor"));
+    }
+
+    @Test
+    void failingSourceConstructorIsReported() {
+        assertTrue(failureOf("app-failing-constructor.properties").contains("broken source laptops-test.csv"));
+    }
+
+    @Test
+    void serviceClassOfWrongTypeIsReported() {
+        assertTrue(failureOf("app-wrong-service-type.properties").contains("EquipmentService"));
+    }
+
+    @Test
+    void missingServiceClassPropertyIsReported() {
+        assertTrue(failureOf("app-no-service.properties").contains("service.class"));
+    }
+
+    @Test
+    void missingSourceClassPropertyIsReported() {
+        assertTrue(failureOf("app-no-source.properties").contains("source.mice"));
+    }
+
+    @Test
     void failedConfigurationLeavesFactoriesUntouched() {
         failureOf("app-no-name.properties");
 
