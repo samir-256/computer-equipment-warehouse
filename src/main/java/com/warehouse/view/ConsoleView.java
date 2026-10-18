@@ -18,12 +18,19 @@ public final class ConsoleView implements View {
     private final PrintStream out;
     private final Controller controller;
     private final AppInfo info;
+    private final boolean echoInput;
 
     public ConsoleView(BufferedReader in, PrintStream out, Controller controller, AppInfo info) {
+        this(in, out, controller, info, false);
+    }
+
+    public ConsoleView(BufferedReader in, PrintStream out, Controller controller, AppInfo info,
+                       boolean echoInput) {
         this.in = Objects.requireNonNull(in, "Input must not be null");
         this.out = Objects.requireNonNull(out, "Output must not be null");
         this.controller = Objects.requireNonNull(controller, "Controller must not be null");
         this.info = Objects.requireNonNull(info, "Application info must not be null");
+        this.echoInput = echoInput;
     }
 
     @Override
@@ -60,7 +67,11 @@ public final class ConsoleView implements View {
         out.print(PROMPT);
         out.flush();
         try {
-            return in.readLine();
+            String line = in.readLine();
+            if (echoInput && line != null) {
+                out.println(line);
+            }
+            return line;
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot read user input", e);
         }
