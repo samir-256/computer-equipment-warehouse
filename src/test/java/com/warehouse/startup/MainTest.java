@@ -34,7 +34,7 @@ class MainTest {
     @Test
     void fullSessionWorksFromStartToExit() {
         String output = run("list laptops sort=price:desc\nfind laptops brand=Nobody\nfind mice connection=wired\n"
-                + "dance\nexit\nlist mice\n", "app-test.properties");
+                + "dance\nexit\nlist mice\n", "--config", "app-test.properties");
 
         assertTrue(output.contains("Test Warehouse"));
         assertTrue(output.contains("Version: 9.9"));

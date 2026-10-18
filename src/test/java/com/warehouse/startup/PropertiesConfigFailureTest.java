@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.warehouse.controller.ControllerFactory;
 import com.warehouse.view.ViewFactory;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 class PropertiesConfigFailureTest {
@@ -35,6 +36,14 @@ class PropertiesConfigFailureTest {
 
         assertTrue(message.contains("app.created"));
         assertTrue(message.contains("yesterday"));
+    }
+
+    @Test
+    void missingBatchFileIsReported() {
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> new PropertiesConfig("app-test.properties", Path.of("no-such-commands.txt")).init());
+
+        assertTrue(error.getMessage().contains("no-such-commands.txt"));
     }
 
     @Test

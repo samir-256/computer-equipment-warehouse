@@ -142,6 +142,24 @@ class ConsoleViewTest {
     }
 
     @Test
+    void echoedInputShowsTheCommandsOfABatchRun() {
+        FakeController controller = new FakeController();
+        StubInput io = new StubInput("find laptops\nexit\n");
+
+        new ConsoleView(io.in(), io.out(), controller, INFO, true).start();
+
+        assertTrue(io.output().contains("> find laptops"));
+        assertTrue(io.output().contains("> exit"));
+    }
+
+    @Test
+    void inputIsNotEchoedByDefault() {
+        String output = run("find laptops\nexit\n", new FakeController());
+
+        assertFalse(output.contains("> find laptops"));
+    }
+
+    @Test
     void crashShowsShortMessage() {
         StubInput io = new StubInput("");
 

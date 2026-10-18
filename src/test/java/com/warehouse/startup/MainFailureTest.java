@@ -25,7 +25,7 @@ class MainFailureTest {
 
     @Test
     void missingPropertiesFileGivesClearMessage() {
-        String errors = runAndCaptureErrors("missing.properties");
+        String errors = runAndCaptureErrors("--config", "missing.properties");
 
         assertTrue(errors.contains("The application cannot start: Properties file not found: missing.properties"));
     }
@@ -33,7 +33,7 @@ class MainFailureTest {
     @ParameterizedTest
     @ValueSource(strings = {"app-no-name.properties", "app-bad-date.properties", "app-no-data.properties"})
     void brokenPropertiesGiveClearMessage(String resource) {
-        String errors = runAndCaptureErrors(resource);
+        String errors = runAndCaptureErrors("--config", resource);
 
         assertTrue(errors.contains("The application cannot start:"));
         assertTrue(errors.contains(resource));
@@ -44,5 +44,13 @@ class MainFailureTest {
         String errors = runAndCaptureErrors("one", "two");
 
         assertTrue(errors.contains("Usage:"));
+    }
+
+    @Test
+    void missingBatchFileGivesClearMessage() {
+        String errors = runAndCaptureErrors("--config", "app-test.properties", "--batch", "no-such-commands.txt");
+
+        assertTrue(errors.contains("The application cannot start: Cannot read batch file"));
+        assertTrue(errors.contains("no-such-commands.txt"));
     }
 }
