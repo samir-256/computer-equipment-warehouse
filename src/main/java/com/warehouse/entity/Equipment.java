@@ -48,6 +48,10 @@ public abstract class Equipment implements Serializable {
 
     protected abstract String ownFields();
 
+    public String details() {
+        return ownFields();
+    }
+
     @Override
     public String toString() {
         return String.format(Locale.US,

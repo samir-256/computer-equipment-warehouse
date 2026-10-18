@@ -44,6 +44,15 @@ class LaptopTest {
     }
 
     @Test
+    void shouldShowOwnFieldsInDetails() {
+        String details = validBuilder().build().details();
+
+        assertTrue(details.contains("cpu="));
+        assertTrue(details.contains("ramGb="));
+        assertTrue(details.contains("screenSize="));
+    }
+
+    @Test
     void shouldCalculateTotalCost() {
         assertEquals(3000.0, validBuilder().build().totalCost(), 0.001);
         assertEquals(0.0, validBuilder().quantity(0).build().totalCost(), 0.001);
