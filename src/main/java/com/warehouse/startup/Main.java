@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 public final class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
-    private static final String USAGE = "Usage: java -jar computer-equipment-warehouse-1.0.jar [properties-file]";
 
     private Main() {
     }
@@ -16,11 +15,8 @@ public final class Main {
     public static void main(String[] args) {
         View view = null;
         try {
-            if (args.length > 1) {
-                throw new IllegalArgumentException(USAGE);
-            }
-            String resource = args.length == 1 ? args[0] : PropertiesConfig.DEFAULT_RESOURCE;
-            Config config = new PropertiesConfig(resource);
+            StartupArguments arguments = StartupArguments.parse(args);
+            Config config = new PropertiesConfig(arguments.configResource(), arguments.batchFile());
             config.init();
             view = ViewFactory.getView();
             view.start();

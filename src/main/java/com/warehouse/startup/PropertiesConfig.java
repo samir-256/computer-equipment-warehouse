@@ -25,7 +25,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
@@ -36,23 +39,42 @@ public final class PropertiesConfig implements Config {
     public static final String DEFAULT_RESOURCE = "app.properties";
 
     private final String resourceName;
+    private final Path batchFile;
 
     public PropertiesConfig(String resourceName) {
+        this(resourceName, null);
+    }
+
+    public PropertiesConfig(String resourceName, Path batchFile) {
         this.resourceName = resourceName;
+        this.batchFile = batchFile;
     }
 
     @Override
     public void init() {
         Properties properties = load();
         AppInfo info = appInfo(properties);
+        BufferedReader input = input();
         DaoFactory.init(daos(properties));
         ServiceFactory.init(new EquipmentServiceImpl());
         ControllerFactory.init(new ControllerImpl(new CommandProvider(ServiceFactory.getService())));
         ViewFactory.init(new ConsoleView(
-                new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8)),
+                input,
                 System.out,
                 ControllerFactory.getController(),
-                info));
+                info,
+                batchFile != null));
+    }
+
+    private BufferedReader input() {
+        if (batchFile == null) {
+            return new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+        }
+        try {
+            return new BufferedReader(new StringReader(Files.readString(batchFile, StandardCharsets.UTF_8)));
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot read batch file " + batchFile, e);
+        }
     }
 
     private Properties load() {
