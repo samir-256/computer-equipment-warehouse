@@ -23,8 +23,8 @@ class AllMatchCriteriaTest {
     void shouldMatchWhenAllParametersMatch() {
         SearchCriteria<Laptop> criteria = new AllMatchCriteria<Laptop>()
                 .add(new BrandParameter("Acme"))
-                .add(new PriceRangeParameter(new Range<>(null, 1200.0)))
-                .add(new ScreenSizeParameter<>(new Range<>(15.0, null)));
+                .add(RangeParameter.price(new Range<>(null, 1200.0)))
+                .add(RangeParameter.screenSize(new Range<>(15.0, null)));
 
         assertTrue(criteria.test(LAPTOP));
     }
@@ -33,7 +33,7 @@ class AllMatchCriteriaTest {
     void shouldNotMatchWhenOneParameterFails() {
         SearchCriteria<Laptop> criteria = new AllMatchCriteria<Laptop>()
                 .add(new BrandParameter("Acme"))
-                .add(new QuantityRangeParameter(new Range<>(10, null)));
+                .add(RangeParameter.quantity(new Range<>(10, null)));
 
         assertFalse(criteria.test(LAPTOP));
     }

@@ -7,9 +7,7 @@ import com.warehouse.dao.criteria.BrandParameter;
 import com.warehouse.dao.criteria.ConnectionTypeParameter;
 import com.warehouse.dao.criteria.IdParameter;
 import com.warehouse.dao.criteria.NameParameter;
-import com.warehouse.dao.criteria.PriceRangeParameter;
-import com.warehouse.dao.criteria.QuantityRangeParameter;
-import com.warehouse.dao.criteria.ScreenSizeParameter;
+import com.warehouse.dao.criteria.RangeParameter;
 import com.warehouse.dao.criteria.SearchCriteria;
 import com.warehouse.entity.Connectable;
 import com.warehouse.entity.Equipment;
@@ -119,21 +117,22 @@ public class EquipmentServiceImpl implements EquipmentService {
             criteria.add(new BrandParameter(query.brand()));
         }
         if (query.price() != null) {
-            criteria.add(new PriceRangeParameter(query.price()));
+            criteria.add(RangeParameter.price(query.price()));
         }
         if (query.quantity() != null) {
-            criteria.add(new QuantityRangeParameter(query.quantity()));
+            criteria.add(RangeParameter.quantity(query.quantity()));
         }
         return criteria;
     }
 
     private <E extends Equipment & HasScreen> void addScreenFilter(SearchCriteria<E> criteria, SearchQuery query) {
         if (query.screenSize() != null) {
-            criteria.add(new ScreenSizeParameter<E>(query.screenSize()));
+            criteria.add(RangeParameter.<E>screenSize(query.screenSize()));
         }
     }
 
-    private <E extends Equipment & Connectable> void addConnectionFilter(SearchCriteria<E> criteria, SearchQuery query) {
+    private <E extends Equipment & Connectable> void addConnectionFilter(
+            SearchCriteria<E> criteria, SearchQuery query) {
         if (query.connectionType() != null) {
             criteria.add(new ConnectionTypeParameter<E>(query.connectionType()));
         }

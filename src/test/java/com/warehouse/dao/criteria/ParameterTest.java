@@ -18,6 +18,19 @@ class ParameterTest {
     private static final Laptop LAPTOP = Samples.laptop(7, "Acme", 1000.0, 3, 15.6);
 
     @Test
+    void rangeParameterNeedsRangeAndExtractor() {
+        assertThrows(NullPointerException.class, () -> new RangeParameter<Laptop, Double>(null, Laptop::getPrice));
+        assertThrows(NullPointerException.class,
+                () -> new RangeParameter<Laptop, Double>(new Range<>(1.0, 2.0), null));
+    }
+
+    @Test
+    void rangeParameterWorksWithAnyExtractor() {
+        assertTrue(new RangeParameter<>(new Range<>(8, 16), Laptop::getRamGb).test(LAPTOP));
+        assertFalse(new RangeParameter<>(new Range<>(16, 32), Laptop::getRamGb).test(LAPTOP));
+    }
+
+    @Test
     void shouldMatchOnlySameId() {
         assertTrue(new IdParameter(7).test(LAPTOP));
         assertFalse(new IdParameter(8).test(LAPTOP));
@@ -63,31 +76,31 @@ class ParameterTest {
 
     @Test
     void shouldMatchPriceInsideRange() {
-        assertTrue(new PriceRangeParameter(new Range<>(1000.0, 1000.0)).test(LAPTOP));
-        assertTrue(new PriceRangeParameter(new Range<>(500.0, 1500.0)).test(LAPTOP));
-        assertFalse(new PriceRangeParameter(new Range<>(1000.01, 2000.0)).test(LAPTOP));
-        assertFalse(new PriceRangeParameter(new Range<>(null, 999.99)).test(LAPTOP));
+        assertTrue(RangeParameter.price(new Range<>(1000.0, 1000.0)).test(LAPTOP));
+        assertTrue(RangeParameter.price(new Range<>(500.0, 1500.0)).test(LAPTOP));
+        assertFalse(RangeParameter.price(new Range<>(1000.01, 2000.0)).test(LAPTOP));
+        assertFalse(RangeParameter.price(new Range<>(null, 999.99)).test(LAPTOP));
     }
 
     @Test
     void shouldMatchQuantityInsideRange() {
-        assertTrue(new QuantityRangeParameter(new Range<>(3, 3)).test(LAPTOP));
-        assertTrue(new QuantityRangeParameter(new Range<>(1, null)).test(LAPTOP));
-        assertFalse(new QuantityRangeParameter(new Range<>(4, null)).test(LAPTOP));
+        assertTrue(RangeParameter.quantity(new Range<>(3, 3)).test(LAPTOP));
+        assertTrue(RangeParameter.quantity(new Range<>(1, null)).test(LAPTOP));
+        assertFalse(RangeParameter.quantity(new Range<>(4, null)).test(LAPTOP));
     }
 
     @Test
     void shouldRejectNullRanges() {
-        assertThrows(NullPointerException.class, () -> new PriceRangeParameter(null));
-        assertThrows(NullPointerException.class, () -> new QuantityRangeParameter(null));
-        assertThrows(NullPointerException.class, () -> new ScreenSizeParameter<Laptop>(null));
+        assertThrows(NullPointerException.class, () -> RangeParameter.price(null));
+        assertThrows(NullPointerException.class, () -> RangeParameter.quantity(null));
+        assertThrows(NullPointerException.class, () -> RangeParameter.<Laptop>screenSize(null));
     }
 
     @Test
     void shouldMatchScreenSizeOfLaptopsAndMonitors() {
-        ScreenSizeParameter<Laptop> forLaptops = new ScreenSizeParameter<>(new Range<>(15.0, 16.0));
-        ScreenSizeParameter<com.warehouse.entity.Monitor> forMonitors =
-                new ScreenSizeParameter<>(new Range<>(24.0, null));
+        RangeParameter<Laptop, Double> forLaptops = RangeParameter.screenSize(new Range<>(15.0, 16.0));
+        RangeParameter<com.warehouse.entity.Monitor, Double> forMonitors =
+                RangeParameter.screenSize(new Range<>(24.0, null));
 
         assertTrue(forLaptops.test(LAPTOP));
         assertFalse(forLaptops.test(Samples.laptop(1, "Acme", 1.0, 1, 13.3)));

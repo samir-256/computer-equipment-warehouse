@@ -5,15 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.warehouse.common.Range;
+import com.warehouse.dao.criteria.RangeParameter;
 import com.warehouse.dao.criteria.AllMatchCriteria;
 import com.warehouse.dao.criteria.BrandParameter;
 import com.warehouse.dao.criteria.ConnectionTypeParameter;
 import com.warehouse.dao.criteria.IdParameter;
 import com.warehouse.dao.criteria.NameParameter;
 import com.warehouse.dao.criteria.Parameter;
-import com.warehouse.dao.criteria.PriceRangeParameter;
-import com.warehouse.dao.criteria.QuantityRangeParameter;
-import com.warehouse.dao.criteria.ScreenSizeParameter;
 import com.warehouse.dao.criteria.SearchCriteria;
 import com.warehouse.dao.source.LaptopCsvSource;
 import com.warehouse.dao.source.MouseCsvSource;
@@ -63,7 +61,7 @@ class EquipmentDaoImplTest {
     @Test
     void shouldFilterByPriceRange() throws DaoException {
         List<Laptop> found = laptopDao("laptops-test.csv")
-                .find(criteria().add(new PriceRangeParameter(new Range<>(900.0, 1200.0))));
+                .find(criteria().add(RangeParameter.price(new Range<>(900.0, 1200.0))));
 
         assertEquals(List.of(1, 2, 5), ids(found));
     }
@@ -71,7 +69,7 @@ class EquipmentDaoImplTest {
     @Test
     void shouldFilterByQuantityRange() throws DaoException {
         List<Laptop> found = laptopDao("laptops-test.csv")
-                .find(criteria().add(new QuantityRangeParameter(new Range<>(1, null))));
+                .find(criteria().add(RangeParameter.quantity(new Range<>(1, null))));
 
         assertEquals(List.of(1, 3, 4, 5), ids(found));
     }
@@ -79,7 +77,7 @@ class EquipmentDaoImplTest {
     @Test
     void shouldFilterByScreenSize() throws DaoException {
         List<Laptop> found = laptopDao("laptops-test.csv")
-                .find(criteria().add(new ScreenSizeParameter<>(new Range<>(15.0, null))));
+                .find(criteria().add(RangeParameter.screenSize(new Range<>(15.0, null))));
 
         assertEquals(List.of(2, 4, 5), ids(found));
     }
@@ -88,7 +86,7 @@ class EquipmentDaoImplTest {
     void shouldCombineParametersWithAnd() throws DaoException {
         List<Laptop> found = laptopDao("laptops-test.csv").find(criteria()
                 .add(new BrandParameter("Acme"))
-                .add(new QuantityRangeParameter(new Range<>(1, null))));
+                .add(RangeParameter.quantity(new Range<>(1, null))));
 
         assertEquals(List.of(1), ids(found));
     }
