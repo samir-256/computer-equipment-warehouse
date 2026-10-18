@@ -3,6 +3,7 @@ package com.warehouse.controller;
 import com.warehouse.common.Range;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 
 final class ArgumentParser {
 
@@ -14,7 +15,7 @@ final class ArgumentParser {
             return Integer.parseInt(text.trim());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "Parameter '" + key + "' must be a whole number, but was '" + text + "'");
+                    "Parameter '" + key + "' must be a whole number, but was '" + text + "'", e);
         }
     }
 
@@ -27,7 +28,7 @@ final class ArgumentParser {
             return value;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException(
-                    "Parameter '" + key + "' must be a number, but was '" + text + "'");
+                    "Parameter '" + key + "' must be a number, but was '" + text + "'", e);
         }
     }
 
@@ -41,22 +42,21 @@ final class ArgumentParser {
     }
 
     static Range<Double> decimalRange(Map<String, String> options, String minKey, String maxKey) {
-        Double min = optionalDecimal(options, minKey);
-        Double max = optionalDecimal(options, maxKey);
-        return range(min, max, minKey, maxKey);
+        return range(options, minKey, maxKey, ArgumentParser::decimal);
     }
 
     static Range<Integer> integerRange(Map<String, String> options, String minKey, String maxKey) {
-        Integer min = options.containsKey(minKey) ? integer(minKey, options.get(minKey)) : null;
-        Integer max = options.containsKey(maxKey) ? integer(maxKey, options.get(maxKey)) : null;
-        return range(min, max, minKey, maxKey);
+        return range(options, minKey, maxKey, ArgumentParser::integer);
     }
 
-    private static Double optionalDecimal(Map<String, String> options, String key) {
-        return options.containsKey(key) ? decimal(key, options.get(key)) : null;
+    private static <T> T bound(Map<String, String> options, String key, BiFunction<String, String, T> parser) {
+        return options.containsKey(key) ? parser.apply(key, options.get(key)) : null;
     }
 
-    private static <T extends Comparable<T>> Range<T> range(T min, T max, String minKey, String maxKey) {
+    private static <T extends Comparable<T>> Range<T> range(
+            Map<String, String> options, String minKey, String maxKey, BiFunction<String, String, T> parser) {
+        T min = bound(options, minKey, parser);
+        T max = bound(options, maxKey, parser);
         if (min == null && max == null) {
             return null;
         }
@@ -64,7 +64,7 @@ final class ArgumentParser {
             return new Range<>(min, max);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(
-                    "Parameter '" + minKey + "' must not be greater than '" + maxKey + "'");
+                    "Parameter '" + minKey + "' must not be greater than '" + maxKey + "'", e);
         }
     }
 }
