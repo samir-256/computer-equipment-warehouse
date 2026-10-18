@@ -6,17 +6,13 @@ import com.warehouse.controller.ControllerImpl;
 import com.warehouse.dao.DaoFactory;
 import com.warehouse.dao.EquipmentDao;
 import com.warehouse.dao.EquipmentDaoImpl;
-import com.warehouse.dao.source.KeyboardCsvSource;
-import com.warehouse.dao.source.LaptopCsvSource;
-import com.warehouse.dao.source.MonitorCsvSource;
-import com.warehouse.dao.source.MouseCsvSource;
 import com.warehouse.dao.source.Source;
 import com.warehouse.entity.Equipment;
 import com.warehouse.entity.Keyboard;
 import com.warehouse.entity.Laptop;
 import com.warehouse.entity.Monitor;
 import com.warehouse.entity.Mouse;
-import com.warehouse.service.EquipmentServiceImpl;
+import com.warehouse.service.EquipmentService;
 import com.warehouse.service.ServiceFactory;
 import com.warehouse.view.AppInfo;
 import com.warehouse.view.ConsoleView;
@@ -55,8 +51,11 @@ public final class PropertiesConfig implements Config {
         Properties properties = load();
         AppInfo info = appInfo(properties);
         BufferedReader input = input();
-        DaoFactory.init(daos(properties));
-        ServiceFactory.init(new EquipmentServiceImpl());
+        Map<Class<? extends Equipment>, EquipmentDao<? extends Equipment>> daos = daos(properties);
+        EquipmentService service = Instances.create(
+                required(properties, "service.class"), EquipmentService.class);
+        DaoFactory.init(daos);
+        ServiceFactory.init(service);
         ControllerFactory.init(new ControllerImpl(new CommandProvider(ServiceFactory.getService())));
         ViewFactory.init(new ConsoleView(
                 input,
@@ -102,10 +101,16 @@ public final class PropertiesConfig implements Config {
 
     private Map<Class<? extends Equipment>, EquipmentDao<? extends Equipment>> daos(Properties properties) {
         return Map.of(
-                Laptop.class, dao(new LaptopCsvSource(required(properties, "data.laptops"))),
-                Monitor.class, dao(new MonitorCsvSource(required(properties, "data.monitors"))),
-                Mouse.class, dao(new MouseCsvSource(required(properties, "data.mice"))),
-                Keyboard.class, dao(new KeyboardCsvSource(required(properties, "data.keyboards"))));
+                Laptop.class, dao(source(properties, "laptops")),
+                Monitor.class, dao(source(properties, "monitors")),
+                Mouse.class, dao(source(properties, "mice")),
+                Keyboard.class, dao(source(properties, "keyboards")));
+    }
+
+    private Source<? extends Equipment> source(Properties properties, String name) {
+        Source<?> source = Instances.create(required(properties, "source." + name), Source.class,
+                required(properties, "data." + name));
+        return source;
     }
 
     private static <E extends Equipment> EquipmentDao<E> dao(Source<E> source) {
