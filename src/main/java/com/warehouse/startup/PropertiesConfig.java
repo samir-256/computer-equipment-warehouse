@@ -129,7 +129,8 @@ public final class PropertiesConfig implements Config {
         try {
             return LocalDate.parse(text);
         } catch (DateTimeParseException e) {
-            throw new IllegalStateException("Property 'app.created' must look like 2026-12-27 in " + resourceName + ", but was '" + text + "'", e);
+            throw new IllegalStateException("Property 'app.created' must look like 2026-12-27 in "
+                    + resourceName + ", but was '" + text + "'", e);
         }
     }
 }
